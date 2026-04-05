@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>歐易紅包工具</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: url("OKX歐易.png") no-repeat center center fixed;
+        background-size: cover;
+        font-family: Arial, sans-serif;
+    }
+
+    .center {
+        position: absolute;
+        top: 40%;
+        left: 50.9%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .title {
+        color: white;
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    #inputBox {
+        background: black;
+        border: 1.4px solid rgba(255, 255, 255, 0.8);
+        color: white;
+        font-size: 20px;
+        padding: 10px;
+        width: 300px;
+        outline: none;
+        border-radius: 5px;
+    }
+
+    #inputBox::placeholder {
+        color: white;
+        opacity: 0.7;
+    }
+
+    .settings-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: black;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .settings-panel {
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        background: black;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 15px;
+        display: none;
+        color: white;
+        border-radius: 5px;
+    }
+
+    .settings-panel input {
+        width: 200px;
+        margin-bottom: 10px;
+        background: black;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        color: white;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .settings-panel button {
+        background: black;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-right: 5px;
+    }
+</style>
+</head>
+
+<body>
+
+<button class="settings-btn" onclick="toggleSettings()">設定</button>
+
+<div class="settings-panel" id="settingsPanel">
+    <div>網址前綴：</div>
+    <input type="text" id="urlInput">
+
+    <div>Gmail：</div>
+    <input type="text" id="gmailInput">
+
+    <br>
+    <button onclick="saveSettings()">儲存</button>
+    <button onclick="resetSettings()">重設</button>
+</div>
+
+<div class="center">
+    <div class="title">歐易紅包工具</div>
+    <input id="inputBox" type="text" placeholder="輸入口令">
+</div>
+
+<script>
+// ===== 預設常數 =====
+const DEFAULT_BASE_URL = "https://www.okx.com/zh-hant/crypto-gifts/";
+const DEFAULT_GMAIL = "achang12money@gmail.com";
+
+// ===== 初始化 =====
+let BASE_URL = localStorage.getItem("BASE_URL") || DEFAULT_BASE_URL;
+let GMAIL = localStorage.getItem("GMAIL") || DEFAULT_GMAIL;
+
+document.getElementById("urlInput").value = BASE_URL;
+document.getElementById("gmailInput").value = GMAIL;
+
+// ===== 輸入限制 =====
+const input = document.getElementById("inputBox");
+
+input.addEventListener("input", () => {
+    input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+});
+
+// ===== Enter 行為 =====
+input.addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+        const value = input.value;
+        if (!value) return;
+
+        const url = BASE_URL + value;
+        window.open(url, "_blank");
+
+        try {
+            await navigator.clipboard.writeText(GMAIL);
+        } catch (err) {
+            console.log("複製失敗", err);
+        }
+    }
+});
+
+// ===== 設定面板 =====
+function toggleSettings() {
+    const panel = document.getElementById("settingsPanel");
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+}
+
+// ===== 儲存設定 =====
+function saveSettings() {
+    BASE_URL = document.getElementById("urlInput").value;
+    GMAIL = document.getElementById("gmailInput").value;
+
+    localStorage.setItem("BASE_URL", BASE_URL);
+    localStorage.setItem("GMAIL", GMAIL);
+
+    alert("設定已儲存");
+}
+
+// ===== 重設設定 =====
+function resetSettings() {
+    // 清除儲存
+    localStorage.removeItem("BASE_URL");
+    localStorage.removeItem("GMAIL");
+
+    // 還原預設
+    BASE_URL = DEFAULT_BASE_URL;
+    GMAIL = DEFAULT_GMAIL;
+
+    // 更新 UI
+    document.getElementById("urlInput").value = BASE_URL;
+    document.getElementById("gmailInput").value = GMAIL;
+
+    alert("已重設為預設值");
+}
+</script>
+
+</body>
+</html>
